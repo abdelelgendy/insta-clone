@@ -8,6 +8,7 @@ const posts = [
         comment: "just took a few mushrooms lol",
         likes: 21,
         liked: false,
+        saved: false,
         timestamp: "2 hours ago",
         comments: [
             {
@@ -31,6 +32,7 @@ const posts = [
         comment: "i'm feelin a bit stressed tbh",
         likes: 4,
         liked: false,
+        saved: false,
         timestamp: "5 hours ago",
         comments: [
             {
@@ -49,6 +51,7 @@ const posts = [
         comment: "gm friends! which coin are YOU stacking up today?? post below and WAGMI!",
         likes: 152,
         liked: false,
+        saved: false,
         timestamp: "1 day ago",
         comments: [
             {
@@ -87,6 +90,14 @@ const icons = {
     share: `<svg aria-label="Share Post" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
         <line fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2" x1="22" x2="9.218" y1="2" y2="10.083"></line>
         <polygon fill="none" points="11.698,20.334 22,2.001 2,9.218 9.218,10.083 11.698,20.334" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></polygon>
+    </svg>`,
+    
+    bookmark: `<svg aria-label="Save" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+        <polygon fill="none" points="20 21 12 13.44 4 21 4 3 20 3 20 21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polygon>
+    </svg>`,
+    
+    bookmarkFilled: `<svg aria-label="Remove" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+        <path d="M20 22a.999.999 0 0 1-.687-.273L12 14.815l-7.313 6.912A1 1 0 0 1 3 21V3a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1Z"></path>
     </svg>`
 };
 
@@ -113,16 +124,24 @@ function createPost(postData, index) {
             <img class="post-content" src="${postData.post}" alt="Post Image">
             <div class="post-footer">
                 <div class="post-actions">
-                    <button class="action-icon like-btn ${postData.liked ? 'liked' : ''}" 
-                            data-post-index="${index}">
-                        ${postData.liked ? icons.heartFilled : icons.heart}
-                    </button>
-                    <button class="action-icon comment-btn" data-post-index="${index}">
-                        ${icons.comment}
-                    </button>
-                    <button class="action-icon share-btn">
-                        ${icons.share}
-                    </button>
+                    <div class="post-actions-left">
+                        <button class="action-icon like-btn ${postData.liked ? 'liked' : ''}" 
+                                data-post-index="${index}">
+                            ${postData.liked ? icons.heartFilled : icons.heart}
+                        </button>
+                        <button class="action-icon comment-btn" data-post-index="${index}">
+                            ${icons.comment}
+                        </button>
+                        <button class="action-icon share-btn">
+                            ${icons.share}
+                        </button>
+                    </div>
+                    <div class="post-actions-right">
+                        <button class="action-icon save-btn ${postData.saved ? 'saved' : ''}" 
+                                data-post-index="${index}">
+                            ${postData.saved ? icons.bookmarkFilled : icons.bookmark}
+                        </button>
+                    </div>
                 </div>
                 <div class="post-likes">
                     <p class="likes-count">${postData.likes.toLocaleString()} likes</p>
@@ -158,6 +177,9 @@ function renderPosts() {
     
     // Add event listeners for like buttons
     addLikeEventListeners();
+    
+    // Add event listeners for save buttons
+    addSaveEventListeners();
     
     // Add event listeners for comments
     addCommentEventListeners();
@@ -276,6 +298,7 @@ function addComment(postIndex, commentText) {
     
     // Re-add event listeners for the new post
     addLikeEventListeners();
+    addSaveEventListeners();
     addCommentEventListeners();
     addDoubleTapListeners();
 }
@@ -422,6 +445,7 @@ function loadPostsFromStorage() {
             if (posts[index]) {
                 posts[index].likes = savedPost.likes;
                 posts[index].liked = savedPost.liked;
+                posts[index].saved = savedPost.saved || false;
                 // Load comments if they exist
                 if (savedPost.comments) {
                     posts[index].comments = savedPost.comments;
@@ -429,6 +453,62 @@ function loadPostsFromStorage() {
             }
         });
     }
+}
+
+// Function to handle save button clicks
+function addSaveEventListeners() {
+    const saveButtons = document.querySelectorAll('.save-btn');
+    saveButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postIndex = parseInt(this.getAttribute('data-post-index'));
+            toggleSave(postIndex);
+        });
+    });
+}
+
+// Function to toggle save status
+function toggleSave(postIndex) {
+    const post = posts[postIndex];
+    const postElement = document.querySelector(`[data-post-index="${postIndex}"]`);
+    const saveButton = postElement.querySelector('.save-btn');
+    
+    // Toggle save status
+    if (post.saved) {
+        post.saved = false;
+        saveButton.classList.remove('saved');
+        saveButton.innerHTML = icons.bookmark;
+    } else {
+        post.saved = true;
+        saveButton.classList.add('saved');
+        saveButton.innerHTML = icons.bookmarkFilled;
+        
+        // Add save animation
+        createSaveAnimation(saveButton);
+    }
+    
+    // Save the updated posts array to local storage
+    savePostsToStorage();
+}
+
+// Function to create save animation
+function createSaveAnimation(element) {
+    const bookmark = document.createElement('div');
+    bookmark.innerHTML = '🔖';
+    bookmark.style.position = 'fixed';
+    bookmark.style.fontSize = '20px';
+    bookmark.style.pointerEvents = 'none';
+    bookmark.style.zIndex = '1000';
+    bookmark.style.animation = 'bookmarkFloat 0.8s ease-out forwards';
+    
+    const rect = element.getBoundingClientRect();
+    bookmark.style.left = rect.left + rect.width / 2 - 10 + 'px';
+    bookmark.style.top = rect.top + rect.height / 2 - 10 + 'px';
+    
+    document.body.appendChild(bookmark);
+    
+    setTimeout(() => {
+        document.body.removeChild(bookmark);
+    }, 800);
 }
 
 // Render posts when the page loads

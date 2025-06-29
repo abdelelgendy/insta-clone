@@ -109,8 +109,19 @@ html, body {
 .post-actions{
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     padding: 8px 16px;
+}
+
+.post-actions-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.post-actions-right {
+    display: flex;
+    align-items: center;
 }
 
 .post-likes{
@@ -283,6 +294,17 @@ html, body {
 
 .like-btn.animate {
     animation: likeGlow 0.3s ease;
+}
+
+@keyframes bookmarkFloat {
+    0% { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+    100% { 
+        opacity: 0; 
+        transform: translateY(-30px) scale(1.2); 
+    }
 }
 
 /* CSS Variables for theming */
@@ -468,6 +490,28 @@ html, body {
 
 .post-comment-btn:hover.active {
     opacity: 0.7;
+}
+
+/* Save button styles */
+.save-btn:hover {
+    transform: scale(1.15);
+}
+
+.save-btn:active {
+    transform: scale(0.95);
+}
+
+.save-btn.saved {
+    color: var(--text-primary);
+}
+
+/* Remove margin from action icons in the new layout */
+.post-actions-left .action-icon {
+    margin-right: 0;
+}
+
+.post-actions-right .action-icon {
+    margin-right: 0;
 }
 
 @media (max-width: 735px) {
