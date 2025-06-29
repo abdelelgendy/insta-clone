@@ -8,7 +8,19 @@ const posts = [
         comment: "just took a few mushrooms lol",
         likes: 21,
         liked: false,
-        timestamp: "2 hours ago"
+        timestamp: "2 hours ago",
+        comments: [
+            {
+                username: "art_lover_23",
+                text: "This is absolutely stunning! 🎨",
+                timestamp: "1 hour ago"
+            },
+            {
+                username: "gallery_curator",
+                text: "One of your best works yet!",
+                timestamp: "45 minutes ago"
+            }
+        ]
     },
     {
         name: "Gustave Courbet",
@@ -19,7 +31,14 @@ const posts = [
         comment: "i'm feelin a bit stressed tbh",
         likes: 4,
         liked: false,
-        timestamp: "5 hours ago"
+        timestamp: "5 hours ago",
+        comments: [
+            {
+                username: "friend_painter",
+                text: "Hope you're feeling better soon! 💙",
+                timestamp: "3 hours ago"
+            }
+        ]
     },
     {
         name: "Joseph Ducreux",
@@ -30,7 +49,24 @@ const posts = [
         comment: "gm friends! which coin are YOU stacking up today?? post below and WAGMI!",
         likes: 152,
         liked: false,
-        timestamp: "1 day ago"
+        timestamp: "1 day ago",
+        comments: [
+            {
+                username: "crypto_enthusiast",
+                text: "Bitcoin all the way! 🚀",
+                timestamp: "20 hours ago"
+            },
+            {
+                username: "eth_hodler",
+                text: "ETH to the moon! 🌙",
+                timestamp: "18 hours ago"
+            },
+            {
+                username: "nft_collector",
+                text: "Love your positive energy! WAGMI indeed! 💎",
+                timestamp: "15 hours ago"
+            }
+        ]
     }
 ]
 
@@ -40,7 +76,7 @@ const icons = {
         <path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"></path>
     </svg>`,
     
-    heartFilled: `<svg aria-label="Unlike" fill="#ed4956" height="24" role="img" viewBox="0 0 48 48" width="24">
+    heartFilled: `<svg aria-label="Unlike" fill="#ed49556" height="24" role="img" viewBox="0 0 48 48" width="24">
         <path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.2 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
     </svg>`,
     
@@ -56,6 +92,14 @@ const icons = {
 
 // Function to create a post element
 function createPost(postData, index) {
+    const commentsHTML = postData.comments.map(comment => `
+        <div class="comment">
+            <span class="comment-username">${comment.username}</span>
+            <span class="comment-text">${comment.text}</span>
+            <span class="comment-time">${comment.timestamp}</span>
+        </div>
+    `).join('');
+
     return `
         <article class="post" data-post-index="${index}">
             <div class="post-header">
@@ -73,7 +117,7 @@ function createPost(postData, index) {
                             data-post-index="${index}">
                         ${postData.liked ? icons.heartFilled : icons.heart}
                     </button>
-                    <button class="action-icon comment-btn">
+                    <button class="action-icon comment-btn" data-post-index="${index}">
                         ${icons.comment}
                     </button>
                     <button class="action-icon share-btn">
@@ -85,6 +129,18 @@ function createPost(postData, index) {
                 </div>
                 <div class="post-caption">
                     <p><strong>${postData.name}</strong> ${postData.comment}</p>
+                </div>
+                <div class="post-comments">
+                    <div class="comments-list">
+                        ${commentsHTML}
+                    </div>
+                    <div class="view-all-comments ${postData.comments.length <= 2 ? 'hidden' : ''}" data-post-index="${index}">
+                        View all ${postData.comments.length} comments
+                    </div>
+                    <div class="add-comment">
+                        <input type="text" class="comment-input" placeholder="Add a comment..." data-post-index="${index}">
+                        <button class="post-comment-btn" data-post-index="${index}">Post</button>
+                    </div>
                 </div>
                 <div class="post-timestamp">
                     <p>${postData.timestamp}</p>
@@ -102,6 +158,11 @@ function renderPosts() {
     
     // Add event listeners for like buttons
     addLikeEventListeners();
+    
+    // Add event listeners for comments
+    addCommentEventListeners();
+    
+    // Add double-tap listeners
     addDoubleTapListeners();
 }
 
@@ -197,6 +258,102 @@ function createHeartAnimation(element) {
     }, 1000);
 }
 
+// Comments functionality
+function addComment(postIndex, commentText) {
+    const newComment = {
+        username: "you", // In a real app, this would be the current user
+        text: commentText,
+        timestamp: "now"
+    };
+    
+    posts[postIndex].comments.push(newComment);
+    savePostsToStorage();
+    
+    // Re-render the specific post
+    const postElement = document.querySelector(`[data-post-index="${postIndex}"]`);
+    const newPostHTML = createPost(posts[postIndex], postIndex);
+    postElement.outerHTML = newPostHTML;
+    
+    // Re-add event listeners for the new post
+    addLikeEventListeners();
+    addCommentEventListeners();
+    addDoubleTapListeners();
+}
+
+function addCommentEventListeners() {
+    // Comment input listeners
+    const commentInputs = document.querySelectorAll('.comment-input');
+    commentInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const postButton = this.parentElement.querySelector('.post-comment-btn');
+            if (this.value.trim()) {
+                postButton.classList.add('active');
+            } else {
+                postButton.classList.remove('active');
+            }
+        });
+
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                const postIndex = parseInt(this.getAttribute('data-post-index'));
+                addComment(postIndex, this.value.trim());
+            }
+        });
+    });
+
+    // Post comment button listeners
+    const postButtons = document.querySelectorAll('.post-comment-btn');
+    postButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postIndex = parseInt(this.getAttribute('data-post-index'));
+            const input = this.parentElement.querySelector('.comment-input');
+            
+            if (input.value.trim()) {
+                addComment(postIndex, input.value.trim());
+            }
+        });
+    });
+
+    // Comment button listeners (focus on input)
+    const commentButtons = document.querySelectorAll('.comment-btn');
+    commentButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postIndex = parseInt(this.getAttribute('data-post-index'));
+            const postElement = document.querySelector(`[data-post-index="${postIndex}"]`);
+            const commentInput = postElement.querySelector('.comment-input');
+            commentInput.focus();
+        });
+    });
+
+    // View all comments listeners
+    const viewAllButtons = document.querySelectorAll('.view-all-comments');
+    viewAllButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postIndex = parseInt(this.getAttribute('data-post-index'));
+            showAllComments(postIndex);
+        });
+    });
+}
+
+function showAllComments(postIndex) {
+    const post = posts[postIndex];
+    const postElement = document.querySelector(`[data-post-index="${postIndex}"]`);
+    const commentsList = postElement.querySelector('.comments-list');
+    const viewAllButton = postElement.querySelector('.view-all-comments');
+    
+    // Show all comments
+    const allCommentsHTML = post.comments.map(comment => `
+        <div class="comment">
+            <span class="comment-username">${comment.username}</span>
+            <span class="comment-text">${comment.text}</span>
+            <span class="comment-time">${comment.timestamp}</span>
+        </div>
+    `).join('');
+    
+    commentsList.innerHTML = allCommentsHTML;
+    viewAllButton.style.display = 'none';
+}
+
 // Loading state functions
 function showLoadingSkeleton() {
     const postsContainer = document.getElementById('posts-container');
@@ -265,6 +422,10 @@ function loadPostsFromStorage() {
             if (posts[index]) {
                 posts[index].likes = savedPost.likes;
                 posts[index].liked = savedPost.liked;
+                // Load comments if they exist
+                if (savedPost.comments) {
+                    posts[index].comments = savedPost.comments;
+                }
             }
         });
     }
