@@ -4,6 +4,7 @@ const posts = [
         username: "vincey1853",
         location: "Zundert, Netherlands",
         avatar: "images/avatar-vangogh.jpg",
+        hasStory: true,
         post: "images/post-vangogh.jpg",
         comment: "just took a few mushrooms lol",
         likes: 21,
@@ -28,6 +29,7 @@ const posts = [
         username: "gus1819",
         location: "Ornans, France",
         avatar: "images/avatar-courbet.jpg",
+        hasStory: false,
         post: "images/post-courbet.jpg",
         comment: "i'm feelin a bit stressed tbh",
         likes: 4,
@@ -47,6 +49,7 @@ const posts = [
         username: "jd1735",
         location: "Paris, France",
         avatar: "images/avatar-ducreux.jpg",
+        hasStory: true,
         post: "images/post-ducreux.jpg",
         comment: "gm friends! which coin are YOU stacking up today?? post below and WAGMI!",
         likes: 152,
@@ -114,7 +117,9 @@ function createPost(postData, index) {
     return `
         <article class="post" data-post-index="${index}">
             <div class="post-header">
-                <img class="profile-pic" src="${postData.avatar}" alt="Profile Picture">
+                <div class="profile-pic-container ${postData.hasStory ? 'has-story' : ''}">
+                    <img class="profile-pic" src="${postData.avatar}" alt="Profile Picture">
+                </div>
                 <div class="user-info">
                     <h1>${postData.name}</h1>
                     <p>${postData.location}</p>
@@ -446,6 +451,7 @@ function loadPostsFromStorage() {
                 posts[index].likes = savedPost.likes;
                 posts[index].liked = savedPost.liked;
                 posts[index].saved = savedPost.saved || false;
+                posts[index].hasStory = savedPost.hasStory !== undefined ? savedPost.hasStory : posts[index].hasStory;
                 // Load comments if they exist
                 if (savedPost.comments) {
                     posts[index].comments = savedPost.comments;

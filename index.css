@@ -307,6 +307,18 @@ html, body {
     }
 }
 
+@keyframes storyGradient {
+    0% { 
+        background-position: 0% 50%; 
+    }
+    50% { 
+        background-position: 100% 50%; 
+    }
+    100% { 
+        background-position: 0% 50%; 
+    }
+}
+
 /* CSS Variables for theming */
 :root {
     --bg-primary: #fafafa;
@@ -512,6 +524,50 @@ html, body {
 
 .post-actions-right .action-icon {
     margin-right: 0;
+}
+
+/* Story ring styles */
+.profile-pic-container {
+    position: relative;
+    display: inline-block;
+    padding: 2px;
+    border-radius: 50%;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.profile-pic-container.has-story {
+    background: linear-gradient(45deg, 
+        #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d, #f56040, #f77737, #fcaf45, #ffdc80);
+    background-size: 200% 200%;
+    animation: storyGradient 3s ease-in-out infinite;
+    padding: 3px;
+}
+
+.profile-pic-container.has-story:hover {
+    transform: scale(1.05);
+    animation: storyGradient 1s ease-in-out infinite;
+}
+
+.profile-pic-container .profile-pic {
+    border: 3px solid var(--bg-secondary);
+    display: block;
+    transition: border-color 0.2s ease;
+}
+
+.profile-pic-container.has-story .profile-pic:hover {
+    border-color: var(--bg-secondary);
+}
+
+/* Make user-logo work with story ring container */
+.profile-pic-container .user-logo {
+    border: 3px solid var(--bg-secondary);
+    display: block;
+    transition: border-color 0.2s ease;
+}
+
+.profile-pic-container.has-story .user-logo:hover {
+    border-color: var(--bg-secondary);
 }
 
 @media (max-width: 735px) {
