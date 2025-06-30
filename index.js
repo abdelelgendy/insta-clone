@@ -15,11 +15,13 @@ const posts = [
         comments: [
             {
                 username: "art_lover_23",
+                avatar: "images/user-avatar.png",
                 text: "This is absolutely stunning! 🎨",
                 timestamp: "1 hour ago"
             },
             {
                 username: "gallery_curator",
+                avatar: "images/avatar-courbet.jpg",
                 text: "One of your best works yet!",
                 timestamp: "45 minutes ago"
             }
@@ -41,6 +43,7 @@ const posts = [
         comments: [
             {
                 username: "friend_painter",
+                avatar: "images/avatar-ducreux.jpg",
                 text: "Hope you're feeling better soon! 💙",
                 timestamp: "3 hours ago"
             }
@@ -62,16 +65,19 @@ const posts = [
         comments: [
             {
                 username: "crypto_enthusiast",
+                avatar: "images/user-avatar.png",
                 text: "Bitcoin all the way! 🚀",
                 timestamp: "20 hours ago"
             },
             {
                 username: "eth_hodler",
+                avatar: "images/avatar-vangogh.jpg",
                 text: "ETH to the moon! 🌙",
                 timestamp: "18 hours ago"
             },
             {
                 username: "nft_collector",
+                avatar: "images/avatar-courbet.jpg",
                 text: "Love your positive energy! WAGMI indeed! 💎",
                 timestamp: "15 hours ago"
             }
@@ -111,9 +117,14 @@ const icons = {
 function createPost(postData, index) {
     const commentsHTML = postData.comments.map(comment => `
         <div class="comment">
-            <span class="comment-username">${comment.username}</span>
-            <span class="comment-text">${comment.text}</span>
-            <span class="comment-time">${comment.timestamp}</span>
+            <div class="comment-avatar-container">
+                <img class="comment-avatar" src="${comment.avatar}" alt="${comment.username}">
+            </div>
+            <div class="comment-content">
+                <span class="comment-username">${comment.username}</span>
+                <span class="comment-text">${comment.text}</span>
+                <span class="comment-time">${comment.timestamp}</span>
+            </div>
         </div>
     `).join('');
 
@@ -171,6 +182,9 @@ function createPost(postData, index) {
                         View all ${postData.comments.length} comments
                     </div>
                     <div class="add-comment">
+                        <div class="comment-avatar-container">
+                            <img class="comment-avatar" src="images/user-avatar.png" alt="Your avatar">
+                        </div>
                         <input type="text" class="comment-input" placeholder="Add a comment..." data-post-index="${index}">
                         <button class="post-comment-btn" data-post-index="${index}">Post</button>
                     </div>
@@ -301,6 +315,7 @@ function createHeartAnimation(element) {
 function addComment(postIndex, commentText) {
     const newComment = {
         username: "you", // In a real app, this would be the current user
+        avatar: "images/user-avatar.png", // Current user's avatar
         text: commentText,
         timestamp: "now"
     };
@@ -385,9 +400,14 @@ function showAllComments(postIndex) {
     // Show all comments
     const allCommentsHTML = post.comments.map(comment => `
         <div class="comment">
-            <span class="comment-username">${comment.username}</span>
-            <span class="comment-text">${comment.text}</span>
-            <span class="comment-time">${comment.timestamp}</span>
+            <div class="comment-avatar-container">
+                <img class="comment-avatar" src="${comment.avatar}" alt="${comment.username}">
+            </div>
+            <div class="comment-content">
+                <span class="comment-username">${comment.username}</span>
+                <span class="comment-text">${comment.text}</span>
+                <span class="comment-time">${comment.timestamp}</span>
+            </div>
         </div>
     `).join('');
     
@@ -466,9 +486,17 @@ function loadPostsFromStorage() {
                 posts[index].saved = savedPost.saved || false;
                 posts[index].following = savedPost.following !== undefined ? savedPost.following : posts[index].following;
                 posts[index].hasStory = savedPost.hasStory !== undefined ? savedPost.hasStory : posts[index].hasStory;
-                // Load comments if they exist
+                // Load comments if they exist, but preserve avatars from original data
                 if (savedPost.comments) {
-                    posts[index].comments = savedPost.comments;
+                    // Merge saved comments with original avatar data
+                    posts[index].comments = savedPost.comments.map((savedComment, commentIndex) => {
+                        const originalComment = posts[index].comments[commentIndex];
+                        return {
+                            ...savedComment,
+                            // Preserve avatar from original data if saved comment doesn't have one
+                            avatar: savedComment.avatar || (originalComment ? originalComment.avatar : 'images/user-avatar.png')
+                        };
+                    });
                 }
             }
         });
@@ -590,6 +618,34 @@ function createFollowAnimation(element, type) {
     }, 800);
 }
 
+// Function to ensure all comments have avatars
+function ensureCommentsHaveAvatars() {
+    const defaultAvatars = [
+        'images/user-avatar.png',
+        'images/avatar-vangogh.jpg', 
+        'images/avatar-courbet.jpg',
+        'images/avatar-ducreux.jpg'
+    ];
+    
+    posts.forEach(post => {
+        post.comments.forEach((comment, index) => {
+            if (!comment.avatar) {
+                // Assign a default avatar based on username or index
+                comment.avatar = defaultAvatars[index % defaultAvatars.length];
+            }
+        });
+    });
+}
+
+// Debug: Clear localStorage with Ctrl+Shift+D
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        localStorage.removeItem('instagramPosts');
+        console.log('localStorage cleared! Refreshing...');
+        location.reload();
+    }
+});
+
 // Render posts when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize theme
@@ -607,6 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Simulate loading delay (in real app, this would be API call)
     setTimeout(() => {
         loadPostsFromStorage();
+        ensureCommentsHaveAvatars(); // Ensure avatars are set for all comments
         renderPosts();
     }, 800); // 800ms delay to show loading effect
 });
