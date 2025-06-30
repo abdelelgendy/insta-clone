@@ -5,6 +5,7 @@ const posts = [
         location: "Zundert, Netherlands",
         avatar: "images/avatar-vangogh.jpg",
         hasStory: true,
+        following: false,
         post: "images/post-vangogh.jpg",
         comment: "just took a few mushrooms lol",
         likes: 21,
@@ -30,6 +31,7 @@ const posts = [
         location: "Ornans, France",
         avatar: "images/avatar-courbet.jpg",
         hasStory: false,
+        following: true,
         post: "images/post-courbet.jpg",
         comment: "i'm feelin a bit stressed tbh",
         likes: 4,
@@ -50,6 +52,7 @@ const posts = [
         location: "Paris, France",
         avatar: "images/avatar-ducreux.jpg",
         hasStory: true,
+        following: false,
         post: "images/post-ducreux.jpg",
         comment: "gm friends! which coin are YOU stacking up today?? post below and WAGMI!",
         likes: 152,
@@ -124,7 +127,13 @@ function createPost(postData, index) {
                     <h1>${postData.name}</h1>
                     <p>${postData.location}</p>
                 </div>
-                <div class="more-options">⋯</div>
+                <div class="post-header-actions">
+                    <button class="follow-btn ${postData.following ? 'following' : ''}" 
+                            data-post-index="${index}">
+                        ${postData.following ? 'Following' : 'Follow'}
+                    </button>
+                    <div class="more-options">⋯</div>
+                </div>
             </div>
             <img class="post-content" src="${postData.post}" alt="Post Image">
             <div class="post-footer">
@@ -185,6 +194,9 @@ function renderPosts() {
     
     // Add event listeners for save buttons
     addSaveEventListeners();
+    
+    // Add event listeners for follow buttons
+    addFollowEventListeners();
     
     // Add event listeners for comments
     addCommentEventListeners();
@@ -304,6 +316,7 @@ function addComment(postIndex, commentText) {
     // Re-add event listeners for the new post
     addLikeEventListeners();
     addSaveEventListeners();
+    addFollowEventListeners();
     addCommentEventListeners();
     addDoubleTapListeners();
 }
@@ -451,6 +464,7 @@ function loadPostsFromStorage() {
                 posts[index].likes = savedPost.likes;
                 posts[index].liked = savedPost.liked;
                 posts[index].saved = savedPost.saved || false;
+                posts[index].following = savedPost.following !== undefined ? savedPost.following : posts[index].following;
                 posts[index].hasStory = savedPost.hasStory !== undefined ? savedPost.hasStory : posts[index].hasStory;
                 // Load comments if they exist
                 if (savedPost.comments) {
@@ -514,6 +528,65 @@ function createSaveAnimation(element) {
     
     setTimeout(() => {
         document.body.removeChild(bookmark);
+    }, 800);
+}
+
+// Function to handle follow button clicks
+function addFollowEventListeners() {
+    const followButtons = document.querySelectorAll('.follow-btn');
+    followButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postIndex = parseInt(this.getAttribute('data-post-index'));
+            toggleFollow(postIndex);
+        });
+    });
+}
+
+// Function to toggle follow status
+function toggleFollow(postIndex) {
+    const post = posts[postIndex];
+    const postElement = document.querySelector(`[data-post-index="${postIndex}"]`);
+    const followButton = postElement.querySelector('.follow-btn');
+    
+    // Toggle follow status
+    if (post.following) {
+        post.following = false;
+        followButton.classList.remove('following');
+        followButton.textContent = 'Follow';
+        
+        // Add unfollow animation
+        createFollowAnimation(followButton, 'unfollow');
+    } else {
+        post.following = true;
+        followButton.classList.add('following');
+        followButton.textContent = 'Following';
+        
+        // Add follow animation
+        createFollowAnimation(followButton, 'follow');
+    }
+    
+    // Save the updated posts array to local storage
+    savePostsToStorage();
+}
+
+// Function to create follow animation
+function createFollowAnimation(element, type) {
+    const emoji = document.createElement('div');
+    emoji.innerHTML = type === 'follow' ? '👥' : '👋';
+    emoji.style.position = 'fixed';
+    emoji.style.fontSize = '20px';
+    emoji.style.pointerEvents = 'none';
+    emoji.style.zIndex = '1000';
+    emoji.style.animation = 'followFloat 0.8s ease-out forwards';
+    
+    const rect = element.getBoundingClientRect();
+    emoji.style.left = rect.left + rect.width / 2 - 10 + 'px';
+    emoji.style.top = rect.top + rect.height / 2 - 10 + 'px';
+    
+    document.body.appendChild(emoji);
+    
+    setTimeout(() => {
+        document.body.removeChild(emoji);
     }, 800);
 }
 

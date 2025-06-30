@@ -328,6 +328,16 @@ html, body {
     --border-color: #dbdbdb;
     --skeleton-bg: #f0f0f0;
     --skeleton-highlight: #e0e0e0;
+    --hover-bg: rgba(0, 0, 0, 0.05);
+    --follow-btn-bg: #0095f6;
+    --follow-btn-color: #ffffff;
+    --follow-btn-border: #0095f6;
+    --follow-btn-hover-bg: #0077cc;
+    --following-btn-bg: #e0e0e0;
+    --following-btn-color: #262626;
+    --following-btn-border: #dbdbdb;
+    --following-btn-hover-bg: #d1d1d1;
+    --following-btn-hover-color: #262626;
 }
 
 /* Dark Mode Variables */
@@ -339,6 +349,16 @@ html, body {
     --border-color: #2f2f2f;
     --skeleton-bg: #2f2f2f;
     --skeleton-highlight: #3f3f3f;
+    --hover-bg: rgba(255, 255, 255, 0.1);
+    --follow-btn-bg: #0095f6;
+    --follow-btn-color: #ffffff;
+    --follow-btn-border: #0095f6;
+    --follow-btn-hover-bg: #0077cc;
+    --following-btn-bg: #e0e0e0;
+    --following-btn-color: #262626;
+    --following-btn-border: #dbdbdb;
+    --following-btn-hover-bg: #d1d1d1;
+    --following-btn-hover-color: #262626;
 }
 
 [data-theme="light"] {
@@ -349,6 +369,16 @@ html, body {
     --border-color: #dbdbdb;
     --skeleton-bg: #f0f0f0;
     --skeleton-highlight: #e0e0e0;
+    --hover-bg: rgba(0, 0, 0, 0.05);
+    --follow-btn-bg: #0095f6;
+    --follow-btn-color: #ffffff;
+    --follow-btn-border: #0095f6;
+    --follow-btn-hover-bg: #0077cc;
+    --following-btn-bg: #e0e0e0;
+    --following-btn-color: #262626;
+    --following-btn-border: #dbdbdb;
+    --following-btn-hover-bg: #d1d1d1;
+    --following-btn-hover-color: #262626;
 }
 
 /* Bottom Navigation */
@@ -603,5 +633,72 @@ html, body {
     
     body {
         padding-bottom: 60px; /* Add space for bottom nav */
+    }
+}
+
+/* Post header actions (follow button and more options) */
+.post-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Follow button styles */
+.follow-btn {
+    background: var(--follow-btn-bg);
+    color: var(--follow-btn-color);
+    border: 1px solid var(--follow-btn-border);
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+    text-align: center;
+}
+
+.follow-btn:hover {
+    background: var(--follow-btn-hover-bg);
+    transform: scale(1.02);
+}
+
+.follow-btn:active {
+    transform: scale(0.98);
+}
+
+.follow-btn.following {
+    background: var(--following-btn-bg);
+    color: var(--following-btn-color);
+    border-color: var(--following-btn-border);
+}
+
+.follow-btn.following:hover {
+    background: var(--following-btn-hover-bg);
+    color: var(--following-btn-hover-color);
+}
+
+.more-options {
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.more-options:hover {
+    background-color: var(--hover-bg);
+}
+
+@keyframes followFloat {
+    0% { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+    100% { 
+        opacity: 0; 
+        transform: translateY(-25px) scale(1.1); 
     }
 }
